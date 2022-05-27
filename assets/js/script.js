@@ -88,10 +88,22 @@ var displayWeather = function(data, city) {
     weatherContainerEl.appendChild(currentWindSpeed);
 
     // display UVI
+    var uvi = data.current.uvi;
     var currentUVI = document.createElement("h2");
-    currentUVI.innerHTML = "UVI: " + data.current.uvi;
-    weatherContainerEl.appendChild(currentUVI);
+    currentUVI.innerHTML = "UVI: " + uvi;
 
+    // check the current uvi and change backgroundColor to match intensity
+    if(uvi < 5) {
+        currentUVI.style.backgroundColor = "green";
+    }
+    else if(uvi > 8) {
+        currentUVI.style.backgroundColor = "red";
+    }
+    else {
+        currentUVI.style.backgroundColor = "yellow";
+    }
+
+    weatherContainerEl.appendChild(currentUVI);
     // create 5 day forcast 
     // need to start at one because of the api daily array
     for(var i = 1; i < 6; i++) { 
