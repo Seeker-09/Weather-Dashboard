@@ -58,12 +58,12 @@ var displayWeather = function(data, city) {
     // display date
     var today = new Date();
     var dd = today.getDate();
-    var mm = today.getMonth()
-    today = mm + "/" + dd;
+    var mm = today.getMonth() + 1;
+    var todayString = mm + "/" + dd;
 
     var weatherH1El = document.createElement("h1");
     weatherH1El.classList.add("card-header");
-    weatherH1El.textContent = today;
+    weatherH1El.textContent = todayString;
 
     weatherContainerEl.appendChild(weatherH1El);
 
@@ -104,13 +104,41 @@ var displayWeather = function(data, city) {
     }
 
     weatherContainerEl.appendChild(currentUVI);
+
     // create 5 day forcast 
     // need to start at one because of the api daily array
     for(var i = 1; i < 6; i++) { 
-        // creat data elements
-        var fiveDayForcastH1El = document.createElement("h1");
-        fiveDayForcastH1El.textContent = data.daily[i].temp.day;
-        fiveDayForcastEl.appendChild(fiveDayForcastH1El);
+        // display date
+        var futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + i);
+        var futureDD = futureDate.getDate();
+        var futureMM = futureDate.getMonth() + 1;
+        var futureDateString = futureMM + "/" + futureDD;
+
+        var futureForcastDate = document.createElement("h1");
+        futureForcastDate.innerHTML = futureDateString;
+        futureForcastDate.classList.add("card-header");
+        fiveDayForcastEl.appendChild(futureForcastDate);
+
+        // display icon for future weather
+        var weatherIconEl = document.createElement("img");
+        weatherIconEl.src = "http://openweathermap.org/img/wn/" + data.daily[i].weather[0].icon + "@2x.png";
+        fiveDayForcastEl.appendChild(weatherIconEl);
+
+        // display current temp
+        var currentTempEl = document.createElement("h2");
+        currentTempEl.innerHTML = "Temperature: " + data.daily[i].temp.day + " " + "&deg;F";
+        fiveDayForcastEl.appendChild(currentTempEl);
+
+        // display Humidity 
+        var currentHumidity = document.createElement("h2");
+        currentHumidity.innerHTML = "Humidity: " + data.daily[i].humidity + "%";
+        fiveDayForcastEl.appendChild(currentHumidity);
+
+        // display wind speed
+        var currentWindSpeed = document.createElement("h2");
+        currentWindSpeed.innerHTML = "Wind Speed: " + data.daily[i].wind_speed + " MPH";
+        fiveDayForcastEl.appendChild(currentWindSpeed);
     }
 }
 
