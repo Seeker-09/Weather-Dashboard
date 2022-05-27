@@ -28,6 +28,8 @@ var formSubmitHandler = function(event) {
 // search for city and add to search history 
 var citySearch = function(city) {
     var forwardGeocodingApiUrl = "http://api.positionstack.com/v1/forward?access_key=06b4b41ae1b10125007229899332ca78&query=" + city;
+    
+    console.log(city);
 
     // get longitude and latitude 
     fetch(forwardGeocodingApiUrl).then(function(response) {
@@ -40,6 +42,7 @@ var citySearch = function(city) {
             // apply longitude and latitude to weather api
             fetch(weatherApiUrl).then(function(response) {
                 response.json().then(function(data) {
+                    console.log(data);
                     console.log(data.daily[0].dt);
                     displayWeather(data, city);
                 })
@@ -52,10 +55,42 @@ var displayWeather = function(data, city) {
     // display city 
     weatherSearchTerm.textContent = city;
 
-    // create header element
+    // display date
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()
+    today = mm + "/" + dd;
+
     var weatherH1El = document.createElement("h1");
-    weatherH1El.textContent = data.current.temp;
+    weatherH1El.classList.add("card-header");
+    weatherH1El.textContent = today;
+
     weatherContainerEl.appendChild(weatherH1El);
+
+    // display icon for today's weather
+    var weatherIconEl = document.createElement("img");
+    weatherIconEl.src = "http://openweathermap.org/img/wn/" + data.current.weather[0].icon + "@2x.png";
+    weatherContainerEl.appendChild(weatherIconEl);
+
+    // display current temp
+    var currentTempEl = document.createElement("h2");
+    currentTempEl.innerHTML = "Temperature: " + data.current.temp + " " + "&deg;F";
+    weatherContainerEl.appendChild(currentTempEl);
+
+    // display Humidity 
+    var currentHumidity = document.createElement("h2");
+    currentHumidity.innerHTML = "Humidity: " + data.current.humidity + "%";
+    weatherContainerEl.appendChild(currentHumidity);
+
+    // display wind speed
+    var currentWindSpeed = document.createElement("h2");
+    currentWindSpeed.innerHTML = "Wind Speed: " + data.current.wind_speed + " MPH";
+    weatherContainerEl.appendChild(currentWindSpeed);
+
+    // display UVI
+    var currentUVI = document.createElement("h2");
+    currentUVI.innerHTML = "UVI: " + data.current.uvi;
+    weatherContainerEl.appendChild(currentUVI);
 
     // create 5 day forcast 
     // need to start at one because of the api daily array
@@ -81,14 +116,6 @@ var saveSearch = function(city) {
     var searchHistoryArrayCounter = searchHistoryArray.length;
     searchHistoryArray[searchHistoryArrayCounter] = city;
     localStorage.setItem("cities", JSON.stringify(searchHistoryArray));
-    savedSearchButton.addEventListener("click", function() {
-        citySearch(city);
-
-        // clear old content
-        weatherContainerEl.textContent = "";
-        fiveDayForcastEl.textContent = "";
-        cityInputEl.value = "";
-    });
 }
 
 // load from local storage
@@ -103,17 +130,18 @@ var loadSearches = function() {
 
         // append button to container
         searchHistoryEl.appendChild(savedSearchButton);
-
-        savedSearchButton.addEventListener("click", function() {
-            citySearch(cities[i]);
-    
-            // clear old content
-            weatherContainerEl.textContent = "";
-            fiveDayForcastEl.textContent = "";
-            cityInputEl.value = "";
-        });
     }
 }
-loadSearches();
 
+// listener for saved searches
+searchHistoryEl.addEventListener("click", function(event) {
+    citySearch(event.target.textContent);
+
+    // clear old content
+    weatherContainerEl.textContent = "";
+    fiveDayForcastEl.textContent = "";
+    cityInputEl.value = "";
+})
+
+loadSearches();
 cityFormEl.addEventListener("submit", formSubmitHandler);
